@@ -5,3 +5,4 @@
 
 IMPLEMENT_PRIMARY_GAME_MODULE( FDefaultGameModuleImpl, FakeOw2, "FakeOw2" );
  
+DEFINE_LOG_CATEGORY(FAKEOW2);
