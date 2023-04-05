@@ -26,14 +26,23 @@ AFakeOw2Character::AFakeOw2Character()
 	FirstPersonCameraComponent->SetRelativeLocation(FVector(-10.f, 0.f, 60.f)); // Position the camera
 	FirstPersonCameraComponent->bUsePawnControlRotation = true;
 
-	// Create a mesh component that will be used when being viewed from a '1st person' view (when controlling this pawn)
-	Mesh1P = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("CharacterMesh1P"));
-	Mesh1P->SetOnlyOwnerSee(true);
-	Mesh1P->SetupAttachment(FirstPersonCameraComponent);
-	Mesh1P->bCastDynamicShadow = false;
-	Mesh1P->CastShadow = false;
-	//Mesh1P->SetRelativeRotation(FRotator(0.9f, -19.19f, 5.2f));
-	Mesh1P->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
+	//스켈레탈메시를 불러온다.
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> TempMesh(
+		TEXT("SkeletalMesh'/Script/Engine.SkeletalMesh'/Game/FirstPersonArms/Character/Mesh/SK_Mannequin_Arms.SK_Mannequin_Arms'")
+	);
+
+	if (TempMesh.Succeeded())
+	{
+		GetMesh()->SetSkeletalMesh(TempMesh.Object);
+		GetMesh()->SetRelativeLocationAndRotation(FVector(0, 0, -90), FRotator(0, 0, -90));
+	}
+
+	//Mesh1P->SetOnlyOwnerSee(true);
+	//Mesh1P->SetupAttachment(FirstPersonCameraComponent);
+	//Mesh1P->bCastDynamicShadow = false;
+	//Mesh1P->CastShadow = false;
+	////Mesh1P->SetRelativeRotation(FRotator(0.9f, -19.19f, 5.2f));
+	//Mesh1P->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
 
 }
 
