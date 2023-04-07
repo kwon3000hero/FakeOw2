@@ -42,6 +42,8 @@ class AFakeOw2Character : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	class UInputAction* MoveAction;
 
+	void Turn(float value);
+	void LookUp(float value);
 	
 public:
 	AFakeOw2Character();

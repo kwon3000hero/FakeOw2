@@ -12,6 +12,18 @@
 //////////////////////////////////////////////////////////////////////////
 // AFakeOw2Character
 
+void AFakeOw2Character::Turn(float value)
+{
+	//Pawn의 함수
+	AddControllerYawInput(value);
+}
+
+void AFakeOw2Character::LookUp(float value)
+{
+	//Pawn의 함수
+	AddControllerPitchInput(value);
+}
+
 AFakeOw2Character::AFakeOw2Character()
 {
 	// Character doesnt have a rifle at start
@@ -28,7 +40,8 @@ AFakeOw2Character::AFakeOw2Character()
 
 	//스켈레탈메시를 불러온다.
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> TempMesh(
-		TEXT("/Script/Engine.SkeletalMesh'/Game/FirstPersonArms/Character/Mesh/SK_Mannequin_Arms.SK_Mannequin_Arms'")
+		
+		TEXT("/ Script / Engine.SkeletalMesh'/Game/FirstPersonArms/Character/Mesh/SK_Mannequin_Arms.SK_Mannequin_Arms'")
 	);
 
 	if (TempMesh.Succeeded())
@@ -72,17 +85,10 @@ void AFakeOw2Character::BeginPlay()
 void AFakeOw2Character::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
 	// Set up action bindings
-	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
+	if (UInputComponent* EnhancedInputComponent = CastChecked<UInputComponent>(PlayerInputComponent))
 	{
-		//Jumping
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &ACharacter::Jump);
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
-
-		//Moving
-		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AFakeOw2Character::Move);
-
-		//Looking
-		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AFakeOw2Character::Look);
+		EnhancedInputComponent->BindAxis(TEXT("Turn"), this, &AFakeOw2Character::Turn);
+		EnhancedInputComponent->BindAxis(TEXT("LookUp"), this, &AFakeOw2Character::LookUp);
 	}
 }
 
