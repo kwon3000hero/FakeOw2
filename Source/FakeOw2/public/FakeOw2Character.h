@@ -13,6 +13,7 @@ class USceneComponent;
 class UCameraComponent;
 class UAnimMontage;
 class USoundBase;
+//class UMyInputConfigData;
 
 UCLASS(config=Game)
 class AFakeOw2Character : public ACharacter
@@ -59,6 +60,12 @@ class AFakeOw2Character : public ACharacter
 	
 public:
 	AFakeOw2Character();
+
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Enhanced Input")
+		class UInputMappingContext* InputMapping;
+	//UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Enhanced Input")
+	//	class UMyInputConfigData* InputActions;
 
 protected:
 	virtual void BeginPlay();

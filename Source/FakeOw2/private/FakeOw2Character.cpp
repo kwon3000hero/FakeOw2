@@ -7,6 +7,7 @@
 #include "Components/CapsuleComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+//#include "InputConfigData.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AFakeOw2Character
@@ -98,7 +99,7 @@ void AFakeOw2Character::BeginPlay()
 void AFakeOw2Character::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
 	// Set up action bindings
-	if (UInputComponent* EnhancedInputComponent = CastChecked<UInputComponent>(PlayerInputComponent))
+	/*if (UInputComponent* EnhancedInputComponent = CastChecked<UInputComponent>(PlayerInputComponent))
 	{
 		EnhancedInputComponent->BindAxis(TEXT("Turn"), this, &AFakeOw2Character::Turn);
 		EnhancedInputComponent->BindAxis(TEXT("LookUp"), this, &AFakeOw2Character::LookUp);
@@ -106,7 +107,22 @@ void AFakeOw2Character::SetupPlayerInputComponent(class UInputComponent* PlayerI
 		EnhancedInputComponent->BindAxis(TEXT("MoveForward"), this, &AFakeOw2Character::InputVertical);
 
 		EnhancedInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &AFakeOw2Character::InputJump);
-	}
+	}*/
+	
+		// Get the local player subsystem
+		APlayerController* PC = Cast<APlayerController>(GetController());
+
+		UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer());
+		// Clear out existing mapping, and add our mapping
+		Subsystem->ClearAllMappings();
+		Subsystem->AddMappingContext(InputMapping, 0);
+
+		if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
+		{
+			/*EnhancedInputComponent->BindAction(InputActions->InputMove, ETriggerEvent::Triggered, this, &AFakeOw2Character::Move);
+			EnhancedInputComponent->BindAction(InputActions->InputLook, ETriggerEvent::Triggered, this, &AFakeOw2Character::LookUp)*/
+		};
+
 }
 
 void AFakeOw2Character::Tick(float DeltaTime)
