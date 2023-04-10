@@ -42,8 +42,20 @@ class AFakeOw2Character : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	class UInputAction* MoveAction;
 
+	UPROPERTY(EditAnywhere, Category = PlayerSetting)
+	float WalkSpeed = 600;
+	
+	FVector Direction;
+
 	void Turn(float value);
 	void LookUp(float value);
+
+	void InputHorizontal(float value);
+	void InputVertical(float value);
+
+	void InputJump();
+
+	void Move();
 	
 public:
 	AFakeOw2Character();
@@ -79,6 +91,7 @@ protected:
 protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
+	virtual void Tick(float DeltaTime) override;
 	// End of APawn interface
 
 public:

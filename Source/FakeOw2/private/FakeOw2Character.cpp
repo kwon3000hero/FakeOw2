@@ -8,7 +8,6 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 
-
 //////////////////////////////////////////////////////////////////////////
 // AFakeOw2Character
 
@@ -16,12 +15,40 @@ void AFakeOw2Character::Turn(float value)
 {
 	//Pawn의 함수
 	AddControllerYawInput(value);
+
+	bUseControllerRotationYaw = true;
+	
+	//2단 점프
+	//JumpMaxCount = 2;
 }
 
 void AFakeOw2Character::LookUp(float value)
 {
 	//Pawn의 함수
 	AddControllerPitchInput(value);
+}
+
+void AFakeOw2Character::InputHorizontal(float value)
+{
+	Direction.Y = value;
+}
+
+void AFakeOw2Character::InputVertical(float value)
+{
+	Direction.X = value;
+}
+
+void AFakeOw2Character::InputJump()
+{
+	Jump();
+}
+
+void AFakeOw2Character::Move()
+{
+	Direction = FTransform(GetControlRotation()).TransformVector(Direction);
+
+	AddMovementInput(Direction);
+	Direction = FVector::ZeroVector;
 }
 
 AFakeOw2Character::AFakeOw2Character()
@@ -31,37 +58,23 @@ AFakeOw2Character::AFakeOw2Character()
 	
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
-		
-	// Create a CameraComponent	
-	//FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
-	//FirstPersonCameraComponent->SetupAttachment(GetCapsuleComponent());
-	//FirstPersonCameraComponent->SetRelativeLocation(FVector(-10.f, 0.f, 60.f)); // Position the camera
-	//FirstPersonCameraComponent->bUsePawnControlRotation = true;
 
 	//스켈레탈메시를 불러온다.
 	ConstructorHelpers::FObjectFinder<USkeletalMesh> TempMesh(
-		
-		TEXT("/ Script / Engine.SkeletalMesh'/Game/FirstPersonArms/Character/Mesh/SK_Mannequin_Arms.SK_Mannequin_Arms'")
+		TEXT("Script / Engine.SkeletalMesh'/Game/FirstPersonArms/Character/Mesh/SK_Mannequin_Arms.SK_Mannequin_Arms'")
 	);
 
 	if (TempMesh.Succeeded())
 	{
 		GetMesh()->SetSkeletalMesh(TempMesh.Object);
-		GetMesh()->SetRelativeLocationAndRotation(FVector(0, 0, -90), FRotator(0, 0, -90));
+		GetMesh()->SetRelativeLocationAndRotation(FVector(0, 0, -90), FRotator(0, 0, 0));
+		Mesh1P = GetMesh();
 	}
 
 	fpsCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("fpsCameraComponent"));
 	fpsCameraComponent->SetupAttachment(RootComponent);
 	fpsCameraComponent->SetRelativeLocation(FVector(-10, 0, 60));
 	fpsCameraComponent->bUsePawnControlRotation = true;
-
-	//Mesh1P->SetOnlyOwnerSee(true);
-	//Mesh1P->SetupAttachment(FirstPersonCameraComponent);
-	//Mesh1P->bCastDynamicShadow = false;
-	//Mesh1P->CastShadow = false;
-	////Mesh1P->SetRelativeRotation(FRotator(0.9f, -19.19f, 5.2f));
-	//Mesh1P->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
-
 }
 
 void AFakeOw2Character::BeginPlay()
@@ -89,7 +102,18 @@ void AFakeOw2Character::SetupPlayerInputComponent(class UInputComponent* PlayerI
 	{
 		EnhancedInputComponent->BindAxis(TEXT("Turn"), this, &AFakeOw2Character::Turn);
 		EnhancedInputComponent->BindAxis(TEXT("LookUp"), this, &AFakeOw2Character::LookUp);
+		EnhancedInputComponent->BindAxis(TEXT("MoveRight"), this, &AFakeOw2Character::InputHorizontal);
+		EnhancedInputComponent->BindAxis(TEXT("MoveForward"), this, &AFakeOw2Character::InputVertical);
+
+		EnhancedInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &AFakeOw2Character::InputJump);
 	}
+}
+
+void AFakeOw2Character::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	Move();
 }
 
 
