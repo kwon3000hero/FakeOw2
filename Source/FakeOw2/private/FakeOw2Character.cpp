@@ -1,5 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
+#include "FakeOw2.h"
 #include "FakeOw2Character.h"
 #include "FakeOw2Projectile.h"
 #include "Animation/AnimInstance.h"
@@ -7,56 +8,21 @@
 #include "Components/CapsuleComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-//#include "InputConfigData.h"
+#include "MyInputConfigData.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AFakeOw2Character
-
-void AFakeOw2Character::Turn(float value)
-{
-	//Pawn의 함수
-	AddControllerYawInput(value);
-
-	bUseControllerRotationYaw = true;
-	
-	//2단 점프
-	//JumpMaxCount = 2;
-}
-
-void AFakeOw2Character::LookUp(float value)
-{
-	//Pawn의 함수
-	AddControllerPitchInput(value);
-}
-
-void AFakeOw2Character::InputHorizontal(float value)
-{
-	Direction.Y = value;
-}
-
-void AFakeOw2Character::InputVertical(float value)
-{
-	Direction.X = value;
-}
 
 void AFakeOw2Character::InputJump()
 {
 	Jump();
 }
 
-void AFakeOw2Character::Move()
-{
-	Direction = FTransform(GetControlRotation()).TransformVector(Direction);
-
-	AddMovementInput(Direction);
-	Direction = FVector::ZeroVector;
-}
-
 AFakeOw2Character::AFakeOw2Character()
 {
 	// Character doesnt have a rifle at start
 	bHasRifle = false;
-	
+
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
 
@@ -75,7 +41,12 @@ AFakeOw2Character::AFakeOw2Character()
 	fpsCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("fpsCameraComponent"));
 	fpsCameraComponent->SetupAttachment(RootComponent);
 	fpsCameraComponent->SetRelativeLocation(FVector(-10, 0, 60));
-	fpsCameraComponent->bUsePawnControlRotation = true;
+	fpsCameraComponent->bUsePawnControlRotation = true;	
+
+	//	bUseControllerRotationYaw = true;
+	//
+	//	//2단 점프
+	//	//JumpMaxCount = 2;
 }
 
 void AFakeOw2Character::BeginPlay()
@@ -83,53 +54,29 @@ void AFakeOw2Character::BeginPlay()
 	// Call the base class  
 	Super::BeginPlay();
 
-	//Add Input Mapping Context
-	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
-	{
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
-		{
-			Subsystem->AddMappingContext(DefaultMappingContext, 0);
-		}
-	}
-
 }
 
 //////////////////////////////////////////////////////////////////////////// Input
 
 void AFakeOw2Character::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
-	// Set up action bindings
-	/*if (UInputComponent* EnhancedInputComponent = CastChecked<UInputComponent>(PlayerInputComponent))
-	{
-		EnhancedInputComponent->BindAxis(TEXT("Turn"), this, &AFakeOw2Character::Turn);
-		EnhancedInputComponent->BindAxis(TEXT("LookUp"), this, &AFakeOw2Character::LookUp);
-		EnhancedInputComponent->BindAxis(TEXT("MoveRight"), this, &AFakeOw2Character::InputHorizontal);
-		EnhancedInputComponent->BindAxis(TEXT("MoveForward"), this, &AFakeOw2Character::InputVertical);
+	// Get the local player subsystem
+	APlayerController* PC = Cast<APlayerController>(GetController());
 
-		EnhancedInputComponent->BindAction(TEXT("Jump"), IE_Pressed, this, &AFakeOw2Character::InputJump);
-	}*/
-	
-		// Get the local player subsystem
-		APlayerController* PC = Cast<APlayerController>(GetController());
+	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer());
+	// Clear out existing mapping, and add our mapping
+	Subsystem->ClearAllMappings();
+	Subsystem->AddMappingContext(InputMoveMapping, 0);
+	Subsystem->AddMappingContext(InputActionMapping, 1);
 
-		UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer());
-		// Clear out existing mapping, and add our mapping
-		Subsystem->ClearAllMappings();
-		Subsystem->AddMappingContext(InputMapping, 0);
-
-		if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
-		{
-			/*EnhancedInputComponent->BindAction(InputActions->InputMove, ETriggerEvent::Triggered, this, &AFakeOw2Character::Move);
-			EnhancedInputComponent->BindAction(InputActions->InputLook, ETriggerEvent::Triggered, this, &AFakeOw2Character::LookUp)*/
-		};
-
+	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent);
+	EnhancedInputComponent->BindAction(InputConfigData->InputMove, ETriggerEvent::Triggered, this, &AFakeOw2Character::Move);
+	EnhancedInputComponent->BindAction(InputConfigData->InputLook, ETriggerEvent::Triggered, this, &AFakeOw2Character::Look);
 }
 
 void AFakeOw2Character::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	Move();
 }
 
 
@@ -138,23 +85,34 @@ void AFakeOw2Character::Move(const FInputActionValue& Value)
 	// input is a Vector2D
 	FVector2D MovementVector = Value.Get<FVector2D>();
 
-	if (Controller != nullptr)
+	const FRotator MovementRotation(0, Controller->GetControlRotation().Yaw, 0);
+
+	// Forward/Backward direction
+	if (MovementVector.Y != 0.f)
 	{
-		// add movement 
-		AddMovementInput(GetActorForwardVector(), MovementVector.Y);
-		AddMovementInput(GetActorRightVector(), MovementVector.X);
+		// Get forward vector
+		const FVector Direction = MovementRotation.RotateVector(FVector::ForwardVector);
+
+		AddMovementInput(Direction, MovementVector.Y);
+	}
+	if (MovementVector.X != 0.f)
+	{
+		// Get forward vector
+		const FVector Direction = MovementRotation.RotateVector(FVector::RightVector);
+
+		AddMovementInput(Direction, MovementVector.X);
 	}
 }
 
 void AFakeOw2Character::Look(const FInputActionValue& Value)
 {
-	// input is a Vector2D
-	FVector2D LookAxisVector = Value.Get<FVector2D>();
-
 	if (Controller != nullptr)
 	{
+		// input is a Vector2D
+		FVector2D LookAxisVector = Value.Get<FVector2D>();
+
 		// add yaw and pitch input to controller
-		AddControllerYawInput(LookAxisVector.X);
+		AddControllerYawInput(-LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
 }

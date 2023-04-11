@@ -13,7 +13,7 @@ class USceneComponent;
 class UCameraComponent;
 class UAnimMontage;
 class USoundBase;
-//class UMyInputConfigData;
+class UMyInputConfigData;
 
 UCLASS(config=Game)
 class AFakeOw2Character : public ACharacter
@@ -43,38 +43,33 @@ class AFakeOw2Character : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	class UInputAction* MoveAction;
 
+	/** Look Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* LookAction;
+
 	UPROPERTY(EditAnywhere, Category = PlayerSetting)
 	float WalkSpeed = 600;
-	
-	FVector Direction;
-
-	void Turn(float value);
-	void LookUp(float value);
-
-	void InputHorizontal(float value);
-	void InputVertical(float value);
 
 	void InputJump();
-
-	void Move();
 	
 public:
 	AFakeOw2Character();
 
 protected:
+	//현재 이해한 의미는 InputAction 모음집이다.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Enhanced Input")
-		class UInputMappingContext* InputMapping;
-	//UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Enhanced Input")
-	//	class UMyInputConfigData* InputActions;
+	class UInputMappingContext* InputMoveMapping;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Enhanced Input")
+	class UInputMappingContext* InputActionMapping;
+	//설정파일인데... C++에서 불러올 방법을 아직 못 찾았다.
+	//현재 UMyInputConfigData은 InputAction의 모음이다.
+	UPROPERTY(EditDefaultsOnly, Category = "Enhanced Input")
+	UMyInputConfigData* InputConfigData;
 
 protected:
 	virtual void BeginPlay();
 
 public:
-		
-	/** Look Input Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* LookAction;
 
 	/** Bool for AnimBP to switch to another animation set */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon)
