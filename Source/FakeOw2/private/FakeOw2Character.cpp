@@ -1,6 +1,5 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
-#include "FakeOw2.h"
 #include "FakeOw2Character.h"
 #include "FakeOw2Projectile.h"
 #include "Animation/AnimInstance.h"
@@ -9,6 +8,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "MyInputConfigData.h"
+#include "FakeOw2.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AFakeOw2Character
