@@ -13,10 +13,6 @@
 //////////////////////////////////////////////////////////////////////////
 // AFakeOw2Character
 
-void AFakeOw2Character::InputJump()
-{
-	Jump();
-}
 
 AFakeOw2Character::AFakeOw2Character()
 {
@@ -27,23 +23,35 @@ AFakeOw2Character::AFakeOw2Character()
 	GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
 
 	//스켈레탈메시를 불러온다.
-	ConstructorHelpers::FObjectFinder<USkeletalMesh> TempMesh(
-		TEXT("Script / Engine.SkeletalMesh'/Game/FirstPersonArms/Character/Mesh/SK_Mannequin_Arms.SK_Mannequin_Arms'")
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> TempArmsMesh(
+		TEXT("/Script/Engine.SkeletalMesh'/Game/FirstPersonArms/Character/Mesh/SK_Mannequin_Arms.SK_Mannequin_Arms'")
 	);
 
-	if (TempMesh.Succeeded())
+	if (TempArmsMesh.Succeeded())
 	{
-		GetMesh()->SetSkeletalMesh(TempMesh.Object);
-		GetMesh()->SetRelativeLocationAndRotation(FVector(0, 0, -90), FRotator(0, 0, 0));
-		Mesh1P = GetMesh();
+		GetMesh()->SetSkeletalMesh(TempArmsMesh.Object);
+		GetMesh()->SetRelativeLocationAndRotation(FVector(0, 0, -90), FRotator(0, 0, -90));
 	}
+
+	//스켈레탈메시를 불러온다.
+	ConstructorHelpers::FObjectFinder<USkeletalMesh> TempGunMesh(
+		TEXT("/Script/Engine.SkeletalMesh'/Game/FPWeapon/Mesh/SK_FPGun.SK_FPGun'")
+	);
+	if (TempGunMesh.Succeeded())
+	{
+		MeshGunComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("GunMeshComp"));
+		MeshGunComp->SetupAttachment(GetMesh());
+		MeshGunComp->SetSkeletalMesh(TempGunMesh.Object);
+		MeshGunComp->SetRelativeLocationAndRotation(FVector(0, 50, 120), FRotator(0, 0, 0));
+	}
+
 
 	fpsCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("fpsCameraComponent"));
 	fpsCameraComponent->SetupAttachment(RootComponent);
 	fpsCameraComponent->SetRelativeLocation(FVector(-10, 0, 60));
-	fpsCameraComponent->bUsePawnControlRotation = true;	
+	fpsCameraComponent->bUsePawnControlRotation = true;
 
-	//	bUseControllerRotationYaw = true;
+	bUseControllerRotationYaw = true;
 	//
 	//	//2단 점프
 	//	//JumpMaxCount = 2;
@@ -72,6 +80,8 @@ void AFakeOw2Character::SetupPlayerInputComponent(class UInputComponent* PlayerI
 	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent);
 	EnhancedInputComponent->BindAction(InputConfigData->InputMove, ETriggerEvent::Triggered, this, &AFakeOw2Character::Move);
 	EnhancedInputComponent->BindAction(InputConfigData->InputLook, ETriggerEvent::Triggered, this, &AFakeOw2Character::Look);
+	EnhancedInputComponent->BindAction(InputConfigData->InputJump, ETriggerEvent::Triggered, this, &AFakeOw2Character::JumpK);
+	EnhancedInputComponent->BindAction(InputConfigData->InputShootNum1, ETriggerEvent::Triggered, this, &AFakeOw2Character::ShootNum1);
 }
 
 void AFakeOw2Character::Tick(float DeltaTime)
@@ -115,6 +125,16 @@ void AFakeOw2Character::Look(const FInputActionValue& Value)
 		AddControllerYawInput(-LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
+}
+
+void AFakeOw2Character::JumpK(const FInputActionValue& Value)
+{
+	Jump();
+}
+
+void AFakeOw2Character::ShootNum1(const FInputActionValue& Value)
+{
+	PRINT_LOG(TEXT("My Log: %s"), TEXT("AFakeOw2Character::ShootNum1"));
 }
 
 void AFakeOw2Character::SetHasRifle(bool bNewHasRifle)

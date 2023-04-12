@@ -20,9 +20,8 @@ class AFakeOw2Character : public ACharacter
 {
 	GENERATED_BODY()
 
-	/** Pawn mesh: 1st person view (arms; seen only by self) */
-	UPROPERTY(VisibleDefaultsOnly, Category=Mesh)
-	USkeletalMeshComponent* Mesh1P;
+	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
+	USkeletalMeshComponent* MeshGunComp;
 
 	/** First person camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
@@ -49,20 +48,18 @@ class AFakeOw2Character : public ACharacter
 
 	UPROPERTY(EditAnywhere, Category = PlayerSetting)
 	float WalkSpeed = 600;
-
-	void InputJump();
 	
 public:
 	AFakeOw2Character();
 
 protected:
-	//현재 이해한 의미는 InputAction 모음집이다.
+	//현재 이해한 의미는 InputAction을 활용할 수 있는 Context이다.
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Enhanced Input")
 	class UInputMappingContext* InputMoveMapping;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Enhanced Input")
 	class UInputMappingContext* InputActionMapping;
 	//설정파일인데... C++에서 불러올 방법을 아직 못 찾았다.
-	//현재 UMyInputConfigData은 InputAction의 모음이다.
+	//현재 이해한 의미는 UMyInputConfigData은 InputAction의 모음이다.
 	UPROPERTY(EditDefaultsOnly, Category = "Enhanced Input")
 	UMyInputConfigData* InputConfigData;
 
@@ -90,6 +87,12 @@ protected:
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
 
+	/** Called for looking input */
+	void JumpK(const FInputActionValue& Value);
+
+	/** Called for looking input */
+	void ShootNum1(const FInputActionValue& Value);
+
 protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
@@ -97,8 +100,10 @@ protected:
 	// End of APawn interface
 
 public:
+
 	/** Returns Mesh1P subobject **/
-	USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
+	USkeletalMeshComponent* GetMeshGunComp() const { return MeshGunComp; }
+
 	/** Returns FirstPersonCameraComponent subobject **/
 	UCameraComponent* GetFirstPersonCameraComponent() const { return fpsCameraComponent; }
 
