@@ -9,6 +9,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "MyInputConfigData.h"
 #include "FakeOw2.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 //////////////////////////////////////////////////////////////////////////
 // AFakeOw2Character
@@ -134,7 +135,19 @@ void AFakeOw2Character::JumpK(const FInputActionValue& Value)
 
 void AFakeOw2Character::ShootNum1(const FInputActionValue& Value)
 {
-	PRINT_LOG(TEXT("My Log: %s"), TEXT("AFakeOw2Character::ShootNum1"));
+	FVector StartVector = fpsCameraComponent->GetComponentLocation();
+	FVector EndVector = fpsCameraComponent->GetComponentLocation() + fpsCameraComponent->GetForwardVector() * 1000.0f;
+	
+	FHitResult hitResult;
+	TArray<AActor*> ActorToIgnore;
+
+	bool bIsHit = UKismetSystemLibrary::LineTraceSingle(this, StartVector, EndVector, UEngineTypes::ConvertToTraceType(ECC_Camera),
+		false, ActorToIgnore, EDrawDebugTrace::ForDuration, hitResult, true);
+	
+	if (true == bIsHit)
+	{
+		UKismetSystemLibrary::PrintString(this);
+	}
 }
 
 void AFakeOw2Character::SetHasRifle(bool bNewHasRifle)
