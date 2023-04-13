@@ -10,6 +10,8 @@
 #include "MyInputConfigData.h"
 #include "FakeOw2.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Kismet/KismetStringLibrary.h"
+
 
 //////////////////////////////////////////////////////////////////////////
 // AFakeOw2Character
@@ -53,9 +55,9 @@ AFakeOw2Character::AFakeOw2Character()
 	fpsCameraComponent->bUsePawnControlRotation = true;
 
 	bUseControllerRotationYaw = true;
-	//
-	//	//2단 점프
-	//	//JumpMaxCount = 2;
+
+	//2단 점프
+	JumpMaxCount = 2;
 }
 
 void AFakeOw2Character::BeginPlay()
@@ -137,17 +139,21 @@ void AFakeOw2Character::ShootNum1(const FInputActionValue& Value)
 {
 	FVector StartVector = fpsCameraComponent->GetComponentLocation();
 	FVector EndVector = fpsCameraComponent->GetComponentLocation() + fpsCameraComponent->GetForwardVector() * 1000.0f;
-	
+
 	FHitResult hitResult;
+	TArray<FHitResult> hitResults;
 	TArray<AActor*> ActorToIgnore;
 
 	bool bIsHit = UKismetSystemLibrary::LineTraceSingle(this, StartVector, EndVector, UEngineTypes::ConvertToTraceType(ECC_Camera),
 		false, ActorToIgnore, EDrawDebugTrace::ForDuration, hitResult, true);
-	
+
 	if (true == bIsHit)
 	{
 		UKismetSystemLibrary::PrintString(this);
+		UKismetSystemLibrary::PrintString(this, UKismetStringLibrary::Conv_BoolToString(bIsHit));
 	}
+
+	
 }
 
 void AFakeOw2Character::SetHasRifle(bool bNewHasRifle)
