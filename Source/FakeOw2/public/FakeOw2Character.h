@@ -1,4 +1,5 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
+// Copyright Epic Games, Inc. All Rights Reserved.
 
 #pragma once
 
@@ -14,6 +15,7 @@ class UCameraComponent;
 class UAnimMontage;
 class USoundBase;
 class UMyInputConfigData;
+class USoldier_WeaponComponent;
 
 UCLASS(config=Game)
 class AFakeOw2Character : public ACharacter
@@ -21,7 +23,7 @@ class AFakeOw2Character : public ACharacter
 	GENERATED_BODY()
 
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
-	USkeletalMeshComponent* MeshGunComp;
+	USoldier_WeaponComponent* MeshWeaponComp;
 
 	/** First person camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
@@ -102,7 +104,7 @@ protected:
 public:
 
 	/** Returns Mesh1P subobject **/
-	USkeletalMeshComponent* GetMeshGunComp() const { return MeshGunComp; }
+	//USkeletalMeshComponent* GetMeshGunComp() const { return MeshGunComp; }
 
 	/** Returns FirstPersonCameraComponent subobject **/
 	UCameraComponent* GetFirstPersonCameraComponent() const { return fpsCameraComponent; }

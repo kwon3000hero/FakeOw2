@@ -2,6 +2,7 @@
 
 #include "FakeOw2Character.h"
 #include "FakeOw2Projectile.h"
+#include "../public/Solder76/Soldier_WeaponComponent.h"
 #include "Animation/AnimInstance.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -37,17 +38,23 @@ AFakeOw2Character::AFakeOw2Character()
 	}
 
 	//스켈레탈메시를 불러온다.
-	ConstructorHelpers::FObjectFinder<USkeletalMesh> TempGunMesh(
-		TEXT("/Script/Engine.SkeletalMesh'/Game/FPWeapon/Mesh/SK_FPGun.SK_FPGun'")
-	);
-	if (TempGunMesh.Succeeded())
+	MeshWeaponComp = CreateDefaultSubobject<USoldier_WeaponComponent>(TEXT("Soldier_WeaponComponent"));
+	if (MeshWeaponComp != nullptr)
 	{
-		MeshGunComp = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("GunMeshComp"));
-		MeshGunComp->SetupAttachment(GetMesh());
-		MeshGunComp->SetSkeletalMesh(TempGunMesh.Object);
-		MeshGunComp->SetRelativeLocationAndRotation(FVector(0, 50, 120), FRotator(0, 0, 0));
-	}
+		MeshWeaponComp->AttachWeapon(this);
+		ConstructorHelpers::FObjectFinder<USkeletalMesh> TempGunMesh(
+			TEXT("/Script/Engine.SkeletalMesh'/Game/FPWeapon/Mesh/SK_FPGun.SK_FPGun'")
+		);
 
+		if (TempGunMesh.Succeeded())
+		{
+			MeshWeaponComp->SetSkeletalMesh(TempGunMesh.Object);
+			MeshWeaponComp->SetRelativeLocationAndRotation(FVector(0, 50, 120), FRotator(0, 0, 0));
+			UKismetSystemLibrary::PrintString(this, TEXT("!!!!"));
+		}
+
+		UKismetSystemLibrary::PrintString(this, TEXT("???"));
+	}
 
 	fpsCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("fpsCameraComponent"));
 	fpsCameraComponent->SetupAttachment(RootComponent);
@@ -153,7 +160,7 @@ void AFakeOw2Character::ShootNum1(const FInputActionValue& Value)
 		UKismetSystemLibrary::PrintString(this, UKismetStringLibrary::Conv_BoolToString(bIsHit));
 	}
 
-	
+
 }
 
 void AFakeOw2Character::SetHasRifle(bool bNewHasRifle)
