@@ -38,23 +38,23 @@ AFakeOw2Character::AFakeOw2Character()
 	}
 
 	//스켈레탈메시를 불러온다.
-	MeshWeaponComp = CreateDefaultSubobject<USoldier_WeaponComponent>(TEXT("Soldier_WeaponComponent"));
-	if (MeshWeaponComp != nullptr)
-	{
-		MeshWeaponComp->AttachWeapon(this);
-		ConstructorHelpers::FObjectFinder<USkeletalMesh> TempGunMesh(
-			TEXT("/Script/Engine.SkeletalMesh'/Game/FPWeapon/Mesh/SK_FPGun.SK_FPGun'")
-		);
+	//MeshWeaponComp = CreateDefaultSubobject<USoldier_WeaponComponent>(TEXT("Soldier_WeaponComponent"));
+	//if (MeshWeaponComp != nullptr)
+	//{
+	//	//MeshWeaponComp->AttachWeapon(this);
+	//	ConstructorHelpers::FObjectFinder<USkeletalMesh> TempGunMesh(
+	//		TEXT("/Script/Engine.SkeletalMesh'/Game/FPWeapon/Mesh/SK_FPGun.SK_FPGun'")
+	//	);
 
-		if (TempGunMesh.Succeeded())
-		{
-			MeshWeaponComp->SetSkeletalMesh(TempGunMesh.Object);
-			MeshWeaponComp->SetRelativeLocationAndRotation(FVector(0, 50, 120), FRotator(0, 0, 0));
-			UKismetSystemLibrary::PrintString(this, TEXT("!!!!"));
-		}
+	//	if (TempGunMesh.Succeeded())
+	//	{
+	//		MeshWeaponComp->SetSkeletalMesh(TempGunMesh.Object);
+	//		MeshWeaponComp->SetRelativeLocationAndRotation(FVector(0, 50, 120), FRotator(0, 0, 0));
+	//		UKismetSystemLibrary::PrintString(this, TEXT("!!!!"));
+	//	}
 
-		UKismetSystemLibrary::PrintString(this, TEXT("???"));
-	}
+	//	UKismetSystemLibrary::PrintString(this, TEXT("???"));
+	//}
 
 	fpsCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("fpsCameraComponent"));
 	fpsCameraComponent->SetupAttachment(RootComponent);
